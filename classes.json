@@ -1,0 +1,253 @@
+{
+  "classes": [
+    "Corn___Common_Rust",
+    "Corn___Gray_Leaf_Spot",
+    "Corn___Healthy",
+    "Invalid",
+    "Potato___Early_Blight",
+    "Potato___Healthy",
+    "Potato___Late_Blight",
+    "Rice___Brown_Spot",
+    "Rice___Healthy",
+    "Rice___Leaf_Blast",
+    "Wheat___Brown_Rust",
+    "Wheat___Healthy",
+    "Wheat___Yellow_Rust"
+  ],
+  "database": {
+    "Corn___Common_Rust": {
+      "plantName": "Corn",
+      "conditionName": "Common Rust",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Corn___Gray_Leaf_Spot": {
+      "plantName": "Corn",
+      "conditionName": "Gray Leaf Spot",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Corn___Healthy": {
+      "plantName": "Corn",
+      "conditionName": "Healthy",
+      "healthStatus": "Healthy",
+      "pathogenType": "None",
+      "symptoms": [
+        "Uniform chlorophyll distribution and intact cellular tissue."
+      ],
+      "treatments": [
+        "Maintain standard N-P-K nutrient feeding schedule."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Maintain clean crop beds and routine foliar monitoring."
+      ]
+    },
+    "Invalid": {
+      "plantName": "Invalid",
+      "conditionName": "Healthy",
+      "healthStatus": "Healthy",
+      "pathogenType": "None",
+      "symptoms": [
+        "Uniform chlorophyll distribution and intact cellular tissue."
+      ],
+      "treatments": [
+        "Maintain standard N-P-K nutrient feeding schedule."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Maintain clean crop beds and routine foliar monitoring."
+      ]
+    },
+    "Potato___Early_Blight": {
+      "plantName": "Potato",
+      "conditionName": "Early Blight",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Potato___Healthy": {
+      "plantName": "Potato",
+      "conditionName": "Healthy",
+      "healthStatus": "Healthy",
+      "pathogenType": "None",
+      "symptoms": [
+        "Uniform chlorophyll distribution and intact cellular tissue."
+      ],
+      "treatments": [
+        "Maintain standard N-P-K nutrient feeding schedule."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Maintain clean crop beds and routine foliar monitoring."
+      ]
+    },
+    "Potato___Late_Blight": {
+      "plantName": "Potato",
+      "conditionName": "Late Blight",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Rice___Brown_Spot": {
+      "plantName": "Rice",
+      "conditionName": "Brown Spot",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Rice___Healthy": {
+      "plantName": "Rice",
+      "conditionName": "Healthy",
+      "healthStatus": "Healthy",
+      "pathogenType": "None",
+      "symptoms": [
+        "Uniform chlorophyll distribution and intact cellular tissue."
+      ],
+      "treatments": [
+        "Maintain standard N-P-K nutrient feeding schedule."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Maintain clean crop beds and routine foliar monitoring."
+      ]
+    },
+    "Rice___Leaf_Blast": {
+      "plantName": "Rice",
+      "conditionName": "Leaf Blast",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Wheat___Brown_Rust": {
+      "plantName": "Wheat",
+      "conditionName": "Brown Rust",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    },
+    "Wheat___Healthy": {
+      "plantName": "Wheat",
+      "conditionName": "Healthy",
+      "healthStatus": "Healthy",
+      "pathogenType": "None",
+      "symptoms": [
+        "Uniform chlorophyll distribution and intact cellular tissue."
+      ],
+      "treatments": [
+        "Maintain standard N-P-K nutrient feeding schedule."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Maintain clean crop beds and routine foliar monitoring."
+      ]
+    },
+    "Wheat___Yellow_Rust": {
+      "plantName": "Wheat",
+      "conditionName": "Yellow Rust",
+      "healthStatus": "Infected",
+      "pathogenType": "Fungal/Bacterial",
+      "symptoms": [
+        "Localized necrotic spotting, concentric rings, or foliar chlorosis."
+      ],
+      "treatments": [
+        "Prune infected blades; apply targeted bio-fungicide or copper hydroxide spray."
+      ],
+      "organicRemedies": [
+        "Apply cold-pressed emulsified neem oil (0.5% concentration) or potassium bicarbonate solution."
+      ],
+      "preventions": [
+        "Transition to subsurface drip irrigation and ensure canopy ventilation."
+      ]
+    }
+  }
+}

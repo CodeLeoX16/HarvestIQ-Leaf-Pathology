@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarvestIQ | AI Plant Pathology</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-badge-icon">🌿</div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>HarvestIQ</span>
+            <span class="ai-pill">AI VISION</span>
+          </div>
+          <span class="brand-sub">Instant Plant Pathology & Treatment Recommendations</span>
+        </div>
+      </div>
+      <div class="system-status">
+        <span class="status-dot"></span>
+        Diagnostic Ready
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Headings -->
+  <div class="hero">
+    <h1>Identify Plant Diseases in <span class="highlight">Seconds</span></h1>
+    <p>Upload or take a photo of an affected plant leaf. Our vision AI detects fungi, bacteria, viruses, nutrient deficiencies, and provides actionable remedies.</p>
+  </div>
+
+  <!-- Workspace Container -->
+  <main class="main-layout">
+    
+    <!-- LEFT PANEL: Image Upload & Controls -->
+    <div class="left-panel">
+      
+      <!-- Upload Card -->
+      <div class="card upload-card">
+        <div class="card-header">
+          <span class="card-title"><span class="icon">📷</span> Leaf Photo</span>
+          <span class="card-meta">JPEG, PNG, WEBP</span>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" hidden>
+
+        <!-- Dropzone Area -->
+        <div class="dropzone" id="dropzone">
+          <div class="drop-inner" id="dropzonePrompt">
+            <div class="upload-icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="drop-title">Click to upload or drag leaf image here</div>
+            <div class="drop-sub">Snap a clear, well-lit close up of the affected or healthy leaf surface.</div>
+          </div>
+
+          <div class="preview-area hidden" id="previewArea">
+            <div class="scan-laser hidden" id="scanLaser"></div>
+            <img id="leafPreview" alt="Leaf Specimen">
+            <button class="btn-clear" id="btnClearImage" title="Remove photo">✕</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-grid">
+          <button class="btn btn-camera" id="btnCamera">
+            <span class="btn-icon">📷</span> Use Camera
+          </button>
+          <button class="btn btn-diagnose" id="btnDiagnose" disabled>
+            <span class="btn-icon">🪄</span> Diagnose Leaf
+          </button>
+        </div>
+      </div>
+
+      <!-- Sample Test Cases -->
+      <div class="card sample-card">
+        <div class="sample-header">
+          <span>NEED A TEST SAMPLE?</span>
+          <span class="click-hint">Click to load</span>
+        </div>
+        <div class="sample-grid">
+          <button class="sample-btn" data-type="apple">
+            <div class="sample-icon icon-orange">🍎</div>
+            <div class="sample-info">
+              <strong>Apple Tree</strong>
+              <span>Apple Scab (Dark lesions)</span>
+            </div>
+          </button>
+
+          <button class="sample-btn" data-type="tomato">
+            <div class="sample-icon icon-red">🍅</div>
+            <div class="sample-info">
+              <strong>Tomato Leaf</strong>
+              <span>Early Blight (Target rings)</span>
+            </div>
+          </button>
+
+          <button class="sample-btn" data-type="corn">
+            <div class="sample-icon icon-blue">🌽</div>
+            <div class="sample-info">
+              <strong>Corn Foliage</strong>
+              <span>Common Rust (Pustules)</span>
+            </div>
+          </button>
+
+          <button class="sample-btn" data-type="healthy">
+            <div class="sample-icon icon-green">🍃</div>
+            <div class="sample-info">
+              <strong>Healthy Leaf</strong>
+              <span>100% Healthy & Vibrant</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Diagnostic Tips -->
+      <div class="tips-box">
+        <div class="tips-title">💡 Tips for 99% Diagnostic Accuracy:</div>
+        <ul>
+          <li>Ensure the leaf blade is in sharp focus without heavy shadows.</li>
+          <li>Capture both healthy tissue and the infected lesions on the blade.</li>
+          <li>Avoid extreme distant shots of entire trees or blurred camera angles.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: Specimen & Diagnosis Results -->
+    <div class="right-panel">
+      <div class="card result-card">
+        
+        <!-- Placeholder State -->
+        <div class="empty-state" id="emptyState">
+          <div class="microscope-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18h8"></path>
+              <path d="M3 22h18"></path>
+              <path d="M14 22a7 7 0 1 0-14 0"></path>
+              <path d="M9 14h2"></path>
+              <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path>
+              <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path>
+            </svg>
+          </div>
+          <h3>Awaiting Leaf Specimen</h3>
+          <p>Select a sample above or upload your own leaf image, then click <strong>Diagnose Leaf</strong> to run deep pathology analysis.</p>
+          
+          <div class="pill-tags">
+            <span class="tag">✓ Fungal & Bacterial</span>
+            <span class="tag">✓ Viral Strains</span>
+            <span class="tag">✓ Nutrient Deficiencies</span>
+          </div>
+        </div>
+
+        <!-- Populated Diagnostic Results -->
+        <div class="diagnostic-content hidden" id="diagnosticContent">
+          
+          <div class="diag-header">
+            <div>
+              <span class="badge-plant" id="resPlant">Tomato</span>
+              <h2 id="resCondition">Early Blight</h2>
+            </div>
+            <span class="status-pill" id="resStatusPill">Infected</span>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-item">
+              <span>Pathogen Class</span>
+              <strong id="resPathogen">Fungal</strong>
+            </div>
+            <div class="metric-item">
+              <span>Confidence</span>
+              <strong id="resConfidence">96.4%</strong>
+            </div>
+            <div class="metric-item">
+              <span>Severity</span>
+              <strong id="resSeverity">Severe</strong>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Observed Symptoms</h4>
+            <ul id="resSymptoms"></ul>
+          </div>
+
+          <div class="detail-section">
+            <h4>Etiology & Causes</h4>
+            <ul id="resCauses"></ul>
+          </div>
+
+          <div class="detail-section highlight-box">
+            <h4>Immediate Chemical / Field Treatments</h4>
+            <ul id="resTreatments"></ul>
+          </div>
+
+          <div class="detail-section">
+            <h4>Eco-Friendly & Organic Remedies</h4>
+            <ul id="resOrganic"></ul>
+          </div>
+
+          <div class="detail-section">
+            <h4>Long-Term Prevention Plan</h4>
+            <ul id="resPreventions"></ul>
+          </div>
+
+          <div class="export-actions">
+            <button class="btn-export" id="btnExport">Print / Save Clinical Notes</button>
+            <button class="btn-export btn-guide" id="btnGuideExport">Treatment Guide PDF</button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Camera Modal -->
+  <div class="modal hidden" id="cameraModal">
+    <div class="modal-box">
+      <h3>Capture Live Leaf Image</h3>
+      <video id="cameraVideo" autoplay playsinline></video>
+      <div class="modal-btns">
+        <button class="btn btn-camera" id="btnTakeSnap">Snap Photo</button>
+        <button class="btn" id="btnCancelCamera">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="guideModal">
+    <div class="modal-box">
+      <h3>Export Treatment Guide</h3>
+      <p class="modal-copy">Choose the language for your disease treatment guide. It will open in a print window where you can select “Save as PDF”.</p>
+      <label class="guide-label" for="guideLanguage">Guide language</label>
+      <select id="guideLanguage" class="guide-select">
+        <option>English</option>
+        <option>Hindi</option>
+        <option>Telugu</option>
+        <option>Tamil</option>
+        <option>Kannada</option>
+        <option>Marathi</option>
+        <option>Bengali</option>
+      </select>
+      <div class="modal-btns">
+        <button class="btn btn-diagnose" id="btnCreateGuide">Create PDF Guide</button>
+        <button class="btn" id="btnCancelGuide">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
