@@ -1,3 +1,4 @@
+@"
 .env
 .env.*
 !.env.example
@@ -7,3 +8,4 @@ __pycache__/
 .cache/
 dataset/
 *.pth
+"@ | Out-File -FilePath .gitignore -Encoding utf8

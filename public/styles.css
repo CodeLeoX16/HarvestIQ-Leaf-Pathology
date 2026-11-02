@@ -530,6 +530,7 @@ body {
 }
 
 .btn-export {
+  margin-top: 1rem;
   padding: 10px;
   background: #f1f5f9;
   border: 1px solid #cbd5e1;
@@ -537,19 +538,6 @@ body {
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
-}
-
-.export-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-.btn-guide {
-  background: #166534;
-  border-color: #166534;
-  color: #fff;
 }
 
 .modal {
@@ -575,26 +563,6 @@ body {
   border-radius: 8px;
   margin: 12px 0;
   background: #000;
-}
-
-.modal-copy {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.guide-label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 700;
-  margin: 1rem 0 6px;
-}
-
-.guide-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font: inherit;
 }
 
 .modal-btns {
