@@ -1,6 +1,3 @@
-// Base URL handles both local testing and decoupled cloud deployment
-const API_BASE = "";
-
 let currentFile = null;
 let cameraStream = null;
 const API_BASE_URL = (window.HARVESTIQ_CONFIG?.API_BASE_URL || '').replace(/\/+$/, '');
@@ -105,7 +102,7 @@ const UI_LABELS = {
 // 1. Silent Warm-up Ping (Wakes Render Backend on Page Load)
 // ---------------------------------------------------------
 window.addEventListener('DOMContentLoaded', () => {
-  fetch(`${API_BASE}/api/health`)
+  fetch(apiUrl('/health'))
     .then(res => res.json())
     .then(() => {
       if (systemStatus) {
@@ -263,11 +260,7 @@ btnDiagnose.addEventListener('click', async () => {
   fd.append('leafImage', currentFile);
 
   try {
-<<<<<<< HEAD
     const res = await fetch(apiUrl('/api/diagnose'), { method: 'POST', body: fd });
-=======
-    const res = await fetch(`${API_BASE}/api/diagnose`, { method: 'POST', body: fd });
->>>>>>> 0e1c337543931bf693e11561a465ae1023791dec
     if (!res.ok) throw new Error("Diagnosis server response failed.");
 
     const data = await res.json();
@@ -324,7 +317,7 @@ if (btnLangBn) {
     // Call backend translation endpoint
     try {
       if (langLoader) langLoader.classList.remove('hidden');
-      const res = await fetch(`${API_BASE}/api/treatment-guide`, {
+      const res = await fetch(apiUrl('/api/treatment-guide'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -415,39 +408,8 @@ if (btnGuideExport && guideModal) {
   });
 }
 
-<<<<<<< HEAD
-btnCancelGuide.addEventListener('click', () => {
-  guideModal.classList.add('hidden');
-});
-
-btnCreateGuide.addEventListener('click', async () => {
-  if (!latestDiagnosis) return;
-
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Please allow pop-ups to create the PDF guide.');
-    return;
-  }
-
-  btnCreateGuide.disabled = true;
-  btnCreateGuide.textContent = 'Preparing guide...';
-  try {
-    const response = await fetch(apiUrl('/api/treatment-guide'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diagnosis: latestDiagnosis, language: guideLanguage.value })
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.detail || 'Treatment guide could not be created.');
-    }
-    const result = await response.json();
-    printWindow.document.write(buildGuideDocument(result.diagnosis, result.language));
-    printWindow.document.close();
-=======
 if (btnCancelGuide && guideModal) {
   btnCancelGuide.addEventListener('click', () => {
->>>>>>> 0e1c337543931bf693e11561a465ae1023791dec
     guideModal.classList.add('hidden');
   });
 }
@@ -465,7 +427,7 @@ if (btnCreateGuide) {
     btnCreateGuide.disabled = true;
     btnCreateGuide.textContent = 'Preparing guide...';
     try {
-      const response = await fetch(`${API_BASE}/api/treatment-guide`, {
+      const response = await fetch(apiUrl('/api/treatment-guide'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ diagnosis: latestDiagnosis, language: guideLanguage.value })
