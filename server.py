@@ -3,6 +3,7 @@ import io
 import json
 import time
 import hashlib
+from contextlib import asynccontextmanager
 import torch
 from PIL import Image
 from dotenv import load_dotenv
@@ -16,23 +17,14 @@ from google import genai
 
 load_dotenv()
 
-app = FastAPI(title="HarvestIQ Leaf Disease Engine")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Limit PyTorch CPU threads to avoid resource contention on free tier hosts
+torch.set_num_threads(2)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_ID = "wambugu71/crop_leaf_diseases_vit"
 
-print(f"Loading HarvestIQ AI Vision Engine on device: {DEVICE}...")
-
 # ---------------------------------------------------------
-# 1. Initialize Local Model and Processor
+# 1. Global Model and Processor Initialization
 # ---------------------------------------------------------
 processor = None
 model = None
@@ -42,11 +34,11 @@ try:
     model = AutoModelForImageClassification.from_pretrained(MODEL_ID)
     if os.path.exists("model.pth"):
         model.load_state_dict(torch.load("model.pth", map_location=DEVICE))
-        print("Local PyTorch model weights loaded successfully.")
+        print("✓ Local PyTorch weights verified.")
     model.to(DEVICE)
     model.eval()
 except Exception as e:
-    print(f"Notice: Local model running in fallback mode: {e}")
+    print(f"Notice: Running fallback mode for local model: {e}")
 
 # ---------------------------------------------------------
 # 2. Multi-Key API Rotation & Gemini Client Setup
@@ -66,12 +58,12 @@ def rotate_key():
     global current_key_idx
     if len(api_keys) > 1:
         current_key_idx = (current_key_idx + 1) % len(api_keys)
-        print(f"Quota threshold reached. Switched to API key #{current_key_idx + 1}")
+        print(f"⚠️ Quota threshold reached. Switched to API key #{current_key_idx + 1}")
 
 if api_keys:
-    print(f"Gemini API connected with {len(api_keys)} key(s) in active rotation pool.")
+    print(f"✓ Gemini API connected with {len(api_keys)} key(s) in active rotation pool.")
 else:
-    print("WARNING: GEMINI_API_KEY is not set. Out-of-domain plant diagnoses may fail.")
+    print("⚠️ WARNING: GEMINI_API_KEY is not set. Out-of-domain plant diagnoses may fail.")
 
 # ---------------------------------------------------------
 # 3. Quota Optimization: Hash Caching & Image Downscaling
@@ -93,12 +85,51 @@ def compress_image_for_api(image_bytes: bytes, max_dim: int = 768) -> bytes:
         return image_bytes
 
 # ---------------------------------------------------------
-# 4. Universal Gemini Diagnostician (With Retry & Backoff)
+# 4. Lifespan Manager (Warmup at Boot)
+# ---------------------------------------------------------
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Pre-warm local model with a dummy inference to eliminate cold latency
+    if model and processor:
+        try:
+            dummy = Image.new("RGB", (224, 224), color="green")
+            inputs = processor(images=dummy, return_tensors="pt").to(DEVICE)
+            with torch.no_grad():
+                model(**inputs)
+            print("✓ Local model warmed up in memory.")
+        except Exception as err:
+            print(f"Warmup warning: {err}")
+    yield
+
+app = FastAPI(title="HarvestIQ Leaf Disease Engine", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ---------------------------------------------------------
+# 5. Health Check Endpoint (Background Wake-Up)
+# ---------------------------------------------------------
+@app.get("/api/health")
+async def health_check():
+    return {
+        "status": "online",
+        "engine": "HarvestIQ AI",
+        "device": str(DEVICE),
+        "keysConfigured": len(api_keys)
+    }
+
+# ---------------------------------------------------------
+# 6. Universal Gemini Diagnostician (With Retry & Backoff)
 # ---------------------------------------------------------
 def diagnose_with_gemini(image_bytes: bytes, mime_type: str = "image/jpeg", max_retries: int = 3):
     img_hash = get_image_hash(image_bytes)
     if img_hash in DIAGNOSIS_CACHE:
-        print("Served diagnosis from in-memory cache.")
+        print("✓ Zero-quota hit: Served diagnosis from in-memory cache.")
         return DIAGNOSIS_CACHE[img_hash]
 
     compressed_bytes = compress_image_for_api(image_bytes)
@@ -164,7 +195,7 @@ Return ONLY a raw JSON object with this exact structure:
     return None
 
 # ---------------------------------------------------------
-# 5. Local Prediction Agronomic Enrichment
+# 7. Local Prediction Agronomic Enrichment
 # ---------------------------------------------------------
 def enrich_local_prediction(plant: str, disease: str, is_healthy: bool):
     if is_healthy:
@@ -199,7 +230,6 @@ Strictly output JSON with these keys:
         except Exception:
             rotate_key()
 
-    # Generic Fallback
     return {
         "symptoms": ["Visible lesions, necrotic leaf spots, or chlorotic foliage margins."],
         "causes": ["Fungal spore incubation accelerated by moisture and leaf humidity."],
@@ -209,7 +239,7 @@ Strictly output JSON with these keys:
     }
 
 # ---------------------------------------------------------
-# 6. Treatment Guide Translation Endpoint
+# 8. Treatment Guide Translation Endpoint
 # ---------------------------------------------------------
 class TreatmentGuideRequest(BaseModel):
     diagnosis: dict
@@ -264,7 +294,7 @@ appropriate. Do not add medical claims or invent treatments. Return only valid J
         raise HTTPException(status_code=502, detail="Treatment guide translation failed due to rate limits.")
 
 # ---------------------------------------------------------
-# 7. Main Foliage Diagnostic Endpoint
+# 9. Main Foliage Diagnostic Endpoint
 # ---------------------------------------------------------
 @app.post("/api/diagnose")
 async def diagnose_leaf(leafImage: UploadFile = File(...)):
@@ -344,20 +374,14 @@ async def diagnose_leaf(leafImage: UploadFile = File(...)):
         "preventions": ["Test with identical leaves to leverage zero-quota local caching."]
     })
 
-# Serve static frontend files
+# Serve static frontend files from 'public' directory
 app.mount("/", StaticFiles(directory="public", html=True), name="public")
 
 # ---------------------------------------------------------
-# 8. Server Execution (Isolated from venv file-watcher reloads)
+# 10. Execution Entrypoint for Local & Cloud Deployments
 # ---------------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(
-        "server:app",
-        host="0.0.0.0",
-        port=port,
-        reload=True,
-        reload_includes=["server.py", "public/*"],
-        reload_excludes=["venv/*", ".git/*", "__pycache__/*", "*.pth"]
-    )
+    # reload=False is required on Render to stay within 512 MB memory limit
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
