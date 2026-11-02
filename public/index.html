@@ -166,6 +166,16 @@
         <!-- Populated Diagnostic Results -->
         <div class="diagnostic-content hidden" id="diagnosticContent">
           
+          <!-- Language Selector Bar -->
+          <div class="language-bar">
+            <span class="lang-label">🌐 Report Language / প্রতিবেদনের ভাষা:</span>
+            <div class="lang-toggle-group">
+              <button type="button" class="btn-lang active" id="btnLangEn">English</button>
+              <button type="button" class="btn-lang" id="btnLangBn">বাংলা (Bengali)</button>
+            </div>
+            <span class="lang-loader hidden" id="langLoader">Translating to বাংলা...</span>
+          </div>
+
           <div class="diag-header">
             <div>
               <span class="badge-plant" id="resPlant">Tomato</span>
@@ -176,47 +186,47 @@
 
           <div class="metrics-row">
             <div class="metric-item">
-              <span>Pathogen Class</span>
+              <span id="labelPathogen">Pathogen Class</span>
               <strong id="resPathogen">Fungal</strong>
             </div>
             <div class="metric-item">
-              <span>Confidence</span>
+              <span id="labelConfidence">Confidence</span>
               <strong id="resConfidence">96.4%</strong>
             </div>
             <div class="metric-item">
-              <span>Severity</span>
+              <span id="labelSeverity">Severity</span>
               <strong id="resSeverity">Severe</strong>
             </div>
           </div>
 
           <div class="detail-section">
-            <h4>Observed Symptoms</h4>
+            <h4 id="labelSymptoms">Observed Symptoms</h4>
             <ul id="resSymptoms"></ul>
           </div>
 
           <div class="detail-section">
-            <h4>Etiology & Causes</h4>
+            <h4 id="labelCauses">Etiology & Causes</h4>
             <ul id="resCauses"></ul>
           </div>
 
           <div class="detail-section highlight-box">
-            <h4>Immediate Chemical / Field Treatments</h4>
+            <h4 id="labelTreatments">Immediate Chemical / Field Treatments</h4>
             <ul id="resTreatments"></ul>
           </div>
 
           <div class="detail-section">
-            <h4>Eco-Friendly & Organic Remedies</h4>
+            <h4 id="labelOrganic">Eco-Friendly & Organic Remedies</h4>
             <ul id="resOrganic"></ul>
           </div>
 
           <div class="detail-section">
-            <h4>Long-Term Prevention Plan</h4>
+            <h4 id="labelPreventions">Long-Term Prevention Plan</h4>
             <ul id="resPreventions"></ul>
           </div>
 
           <div class="export-actions">
             <button class="btn-export" id="btnExport">Print / Save Clinical Notes</button>
-            <button class="btn-export btn-guide" id="btnGuideExport">Treatment Guide PDF</button>
+            <button class="btn-guide" id="btnGuideExport">Export Custom Treatment PDF</button>
           </div>
 
         </div>
@@ -238,23 +248,24 @@
     </div>
   </div>
 
+  <!-- PDF Guide Modal -->
   <div class="modal hidden" id="guideModal">
     <div class="modal-box">
-      <h3>Export Treatment Guide</h3>
-      <p class="modal-copy">Choose the language for your disease treatment guide. It will open in a print window where you can select “Save as PDF”.</p>
-      <label class="guide-label" for="guideLanguage">Guide language</label>
+      <h3>Generate Treatment PDF</h3>
+      <p class="modal-copy">Create a localized clinical agronomic sheet with chemical dosages and safety measures.</p>
+      <label class="guide-label" for="guideLanguage">Select Guide Language:</label>
       <select id="guideLanguage" class="guide-select">
-        <option>English</option>
-        <option>Hindi</option>
-        <option>Telugu</option>
-        <option>Tamil</option>
-        <option>Kannada</option>
-        <option>Marathi</option>
-        <option>Bengali</option>
+        <option value="English">English</option>
+        <option value="Bengali" selected>বাংলা (Bengali)</option>
+        <option value="Hindi">हिन्दी (Hindi)</option>
+        <option value="Telugu">తెలుగు (Telugu)</option>
+        <option value="Tamil">தமிழ் (Tamil)</option>
+        <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+        <option value="Marathi">मराठी (Marathi)</option>
       </select>
       <div class="modal-btns">
-        <button class="btn btn-diagnose" id="btnCreateGuide">Create PDF Guide</button>
         <button class="btn" id="btnCancelGuide">Cancel</button>
+        <button class="btn btn-guide" id="btnCreateGuide">Create PDF Guide</button>
       </div>
     </div>
   </div>

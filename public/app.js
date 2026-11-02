@@ -1,3 +1,6 @@
+// Base URL handles both local testing and decoupled cloud deployment
+const API_BASE = "";
+
 let currentFile = null;
 let cameraStream = null;
 const API_BASE_URL = (window.HARVESTIQ_CONFIG?.API_BASE_URL || '').replace(/\/+$/, '');
@@ -16,6 +19,7 @@ const scanLaser = document.getElementById('scanLaser');
 const btnClearImage = document.getElementById('btnClearImage');
 const btnDiagnose = document.getElementById('btnDiagnose');
 const btnCamera = document.getElementById('btnCamera');
+const systemStatus = document.querySelector('.system-status');
 
 // Camera Modal Handles
 const cameraModal = document.getElementById('cameraModal');
@@ -38,14 +42,89 @@ const resTreatments = document.getElementById('resTreatments');
 const resOrganic = document.getElementById('resOrganic');
 const resPreventions = document.getElementById('resPreventions');
 const btnExport = document.getElementById('btnExport');
+
+// PDF Guide Modal Handles
 const btnGuideExport = document.getElementById('btnGuideExport');
 const guideModal = document.getElementById('guideModal');
 const guideLanguage = document.getElementById('guideLanguage');
 const btnCreateGuide = document.getElementById('btnCreateGuide');
 const btnCancelGuide = document.getElementById('btnCancelGuide');
-let latestDiagnosis = null;
 
-// Sample Generators for Immediate Testing
+// On-Screen Language Toggle Handles
+const btnLangEn = document.getElementById('btnLangEn');
+const btnLangBn = document.getElementById('btnLangBn');
+const langLoader = document.getElementById('langLoader');
+
+// Section Heading Handles for On-Screen Translation
+const labelPathogen = document.getElementById('labelPathogen');
+const labelConfidence = document.getElementById('labelConfidence');
+const labelSeverity = document.getElementById('labelSeverity');
+const labelSymptoms = document.getElementById('labelSymptoms');
+const labelCauses = document.getElementById('labelCauses');
+const labelTreatments = document.getElementById('labelTreatments');
+const labelOrganic = document.getElementById('labelOrganic');
+const labelPreventions = document.getElementById('labelPreventions');
+
+// Diagnostic Caches & Active Language State
+let latestDiagnosis = null;
+let englishDiagnosis = null;
+let bengaliDiagnosis = null;
+let currentLanguage = "English";
+
+// Localized UI Labels
+const UI_LABELS = {
+  English: {
+    pathogen: "Pathogen Class",
+    confidence: "Confidence",
+    severity: "Severity",
+    symptoms: "Observed Symptoms",
+    causes: "Etiology & Causes",
+    treatments: "Immediate Chemical / Field Treatments",
+    organic: "Eco-Friendly & Organic Remedies",
+    preventions: "Long-Term Prevention Plan",
+    exportBtn: "Print / Save Clinical Notes",
+    healthy: "Healthy",
+    infected: "Infected"
+  },
+  Bengali: {
+    pathogen: "রোগ সৃষ্টিকারী জীবাণু",
+    confidence: "নির্ভুলতার হার",
+    severity: "তীব্রতার মাত্রা",
+    symptoms: "লক্ষণসমূহ",
+    causes: "মূল কারণ",
+    treatments: "জরুরী রাসায়নিক / মাঠের চিকিৎসা",
+    organic: "পরিবেশবান্ধব ও জৈব প্রতিকার",
+    preventions: "দীর্ঘমেয়াদী প্রতিরোধ ব্যবস্থা",
+    exportBtn: "চিকিৎসা প্রেসক্রিপশন প্রিন্ট করুন",
+    healthy: "সুস্থ ও স্বাভাবিক",
+    infected: "সংক্রমিত / রোগাক্রান্ত"
+  }
+};
+
+// ---------------------------------------------------------
+// 1. Silent Warm-up Ping (Wakes Render Backend on Page Load)
+// ---------------------------------------------------------
+window.addEventListener('DOMContentLoaded', () => {
+  fetch(`${API_BASE}/api/health`)
+    .then(res => res.json())
+    .then(() => {
+      if (systemStatus) {
+        systemStatus.innerHTML = '<span class="status-dot"></span> Engine Online';
+        systemStatus.style.background = '#ecfdf5';
+        systemStatus.style.borderColor = '#a7f3d0';
+        systemStatus.style.color = '#059669';
+      }
+    })
+    .catch(() => {
+      if (systemStatus) {
+        systemStatus.innerHTML = '<span class="status-dot" style="background:#f59e0b"></span> Waking Engine...';
+      }
+    });
+});
+
+// ---------------------------------------------------------
+// 2. Sample Generators for Immediate Testing
+// ---------------------------------------------------------
 const sampleDrawers = {
   apple: (ctx) => {
     ctx.fillStyle = "#166534"; ctx.fillRect(0, 0, 300, 300);
@@ -76,7 +155,9 @@ const sampleDrawers = {
   }
 };
 
-// Dropzone file handling
+// ---------------------------------------------------------
+// 3. Dropzone & File Handling
+// ---------------------------------------------------------
 dropzone.addEventListener('click', () => {
   if (!currentFile) fileInput.click();
 });
@@ -118,22 +199,28 @@ function loadImage(file) {
   reader.readAsDataURL(file);
 }
 
-// Sample Card triggers
+// ---------------------------------------------------------
+// 4. Sample Testing Buttons
+// ---------------------------------------------------------
 document.querySelectorAll('.sample-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const type = btn.dataset.type;
     const canvas = document.createElement('canvas');
     canvas.width = 300;
     canvas.height = 300;
-    sampleDrawers[type](canvas.getContext('2d'));
-    canvas.toBlob(blob => {
-      const file = new File([blob], `${type}_specimen.png`, { type: 'image/png' });
-      loadImage(file);
-    });
+    if (sampleDrawers[type]) {
+      sampleDrawers[type](canvas.getContext('2d'));
+      canvas.toBlob(blob => {
+        const file = new File([blob], `${type}_specimen.png`, { type: 'image/png' });
+        loadImage(file);
+      });
+    }
   });
 });
 
-// Camera stream triggers
+// ---------------------------------------------------------
+// 5. Camera Video Capture
+// ---------------------------------------------------------
 btnCamera.addEventListener('click', async () => {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -162,7 +249,9 @@ btnTakeSnap.addEventListener('click', () => {
   }, 'image/jpeg');
 });
 
-// Run Diagnosis
+// ---------------------------------------------------------
+// 6. Diagnose Request
+// ---------------------------------------------------------
 btnDiagnose.addEventListener('click', async () => {
   if (!currentFile) return;
 
@@ -174,10 +263,26 @@ btnDiagnose.addEventListener('click', async () => {
   fd.append('leafImage', currentFile);
 
   try {
+<<<<<<< HEAD
     const res = await fetch(apiUrl('/api/diagnose'), { method: 'POST', body: fd });
+=======
+    const res = await fetch(`${API_BASE}/api/diagnose`, { method: 'POST', body: fd });
+>>>>>>> 0e1c337543931bf693e11561a465ae1023791dec
     if (!res.ok) throw new Error("Diagnosis server response failed.");
 
     const data = await res.json();
+    
+    // Cache diagnosis & reset language toggle
+    latestDiagnosis = data;
+    englishDiagnosis = data;
+    bengaliDiagnosis = null;
+    currentLanguage = "English";
+
+    if (btnLangEn && btnLangBn) {
+      btnLangEn.classList.add('active');
+      btnLangBn.classList.remove('active');
+    }
+
     renderDiagnosis(data);
   } catch (err) {
     alert(err.message);
@@ -188,19 +293,88 @@ btnDiagnose.addEventListener('click', async () => {
   }
 });
 
+// ---------------------------------------------------------
+// 7. On-Screen Language Toggle Handlers
+// ---------------------------------------------------------
+if (btnLangEn) {
+  btnLangEn.addEventListener('click', () => {
+    if (currentLanguage === "English") return;
+    currentLanguage = "English";
+    btnLangEn.classList.add('active');
+    if (btnLangBn) btnLangBn.classList.remove('active');
+    if (englishDiagnosis) renderDiagnosis(englishDiagnosis);
+  });
+}
+
+if (btnLangBn) {
+  btnLangBn.addEventListener('click', async () => {
+    if (currentLanguage === "Bengali") return;
+    if (!englishDiagnosis) return;
+
+    currentLanguage = "Bengali";
+    btnLangBn.classList.add('active');
+    if (btnLangEn) btnLangEn.classList.remove('active');
+
+    // Return instant cached translation without extra API calls
+    if (bengaliDiagnosis) {
+      renderDiagnosis(bengaliDiagnosis);
+      return;
+    }
+
+    // Call backend translation endpoint
+    try {
+      if (langLoader) langLoader.classList.remove('hidden');
+      const res = await fetch(`${API_BASE}/api/treatment-guide`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          diagnosis: englishDiagnosis,
+          language: "Bengali"
+        })
+      });
+
+      if (!res.ok) throw new Error("Translation request failed.");
+      const data = await res.json();
+      bengaliDiagnosis = data.diagnosis;
+      renderDiagnosis(bengaliDiagnosis);
+    } catch (err) {
+      alert("বাংলা অনুবাদ লোড করতে সমস্যা হয়েছে: " + err.message);
+      if (btnLangEn) btnLangEn.click();
+    } finally {
+      if (langLoader) langLoader.classList.add('hidden');
+    }
+  });
+}
+
+// ---------------------------------------------------------
+// 8. Render Diagnosis to DOM
+// ---------------------------------------------------------
 function renderDiagnosis(data) {
-  latestDiagnosis = data;
   emptyState.classList.add('hidden');
   diagnosticContent.classList.remove('hidden');
 
+  // Update Section Titles
+  const labels = UI_LABELS[currentLanguage] || UI_LABELS.English;
+  if (labelPathogen) labelPathogen.textContent = labels.pathogen;
+  if (labelConfidence) labelConfidence.textContent = labels.confidence;
+  if (labelSeverity) labelSeverity.textContent = labels.severity;
+  if (labelSymptoms) labelSymptoms.textContent = labels.symptoms;
+  if (labelCauses) labelCauses.textContent = labels.causes;
+  if (labelTreatments) labelTreatments.textContent = labels.treatments;
+  if (labelOrganic) labelOrganic.textContent = labels.organic;
+  if (labelPreventions) labelPreventions.textContent = labels.preventions;
+  if (btnExport) btnExport.textContent = labels.exportBtn;
+
+  // Populate Field Values
   resPlant.textContent = data.plantName || "Unknown Host";
   resCondition.textContent = data.conditionName || "Pathological Specimen";
   resPathogen.textContent = data.pathogenType || "None";
   resConfidence.textContent = `${data.confidenceScore}%`;
   resSeverity.textContent = data.severityRating || "None";
 
-  const isHealthy = (data.healthStatus || "").toLowerCase() === "healthy";
-  resStatusPill.textContent = isHealthy ? "Healthy" : "Infected";
+  const isHealthy = (data.healthStatus || "").toLowerCase().includes("healthy") || 
+                    (data.healthStatus || "").includes("সুস্থ");
+  resStatusPill.textContent = isHealthy ? labels.healthy : labels.infected;
   resStatusPill.className = `status-pill ${isHealthy ? 'healthy' : 'infected'}`;
 
   fillList(resSymptoms, data.symptoms);
@@ -211,9 +385,12 @@ function renderDiagnosis(data) {
 }
 
 function fillList(el, items) {
+  if (!el) return;
   el.innerHTML = '';
   if (!items || items.length === 0) {
-    el.innerHTML = '<li>None required or detected.</li>';
+    el.innerHTML = currentLanguage === "Bengali" 
+      ? '<li>কোন তথ্যের প্রয়োজন নেই।</li>' 
+      : '<li>None required or detected.</li>';
     return;
   }
   items.forEach(text => {
@@ -223,15 +400,22 @@ function fillList(el, items) {
   });
 }
 
+// Print Current Screen View
 btnExport.addEventListener('click', () => {
   window.print();
 });
 
-btnGuideExport.addEventListener('click', () => {
-  if (!latestDiagnosis) return;
-  guideModal.classList.remove('hidden');
-});
+// ---------------------------------------------------------
+// 9. Guide Modal Triggers & PDF Document Generation
+// ---------------------------------------------------------
+if (btnGuideExport && guideModal) {
+  btnGuideExport.addEventListener('click', () => {
+    if (!latestDiagnosis) return;
+    guideModal.classList.remove('hidden');
+  });
+}
 
+<<<<<<< HEAD
 btnCancelGuide.addEventListener('click', () => {
   guideModal.classList.add('hidden');
 });
@@ -260,15 +444,49 @@ btnCreateGuide.addEventListener('click', async () => {
     const result = await response.json();
     printWindow.document.write(buildGuideDocument(result.diagnosis, result.language));
     printWindow.document.close();
+=======
+if (btnCancelGuide && guideModal) {
+  btnCancelGuide.addEventListener('click', () => {
+>>>>>>> 0e1c337543931bf693e11561a465ae1023791dec
     guideModal.classList.add('hidden');
-  } catch (err) {
-    printWindow.close();
-    alert(err.message);
-  } finally {
-    btnCreateGuide.disabled = false;
-    btnCreateGuide.textContent = 'Create PDF Guide';
-  }
-});
+  });
+}
+
+if (btnCreateGuide) {
+  btnCreateGuide.addEventListener('click', async () => {
+    if (!latestDiagnosis) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow pop-ups to create the PDF guide.');
+      return;
+    }
+
+    btnCreateGuide.disabled = true;
+    btnCreateGuide.textContent = 'Preparing guide...';
+    try {
+      const response = await fetch(`${API_BASE}/api/treatment-guide`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diagnosis: latestDiagnosis, language: guideLanguage.value })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.detail || 'Treatment guide could not be created.');
+      }
+      const result = await response.json();
+      printWindow.document.write(buildGuideDocument(result.diagnosis, result.language));
+      printWindow.document.close();
+      if (guideModal) guideModal.classList.add('hidden');
+    } catch (err) {
+      printWindow.close();
+      alert(err.message);
+    } finally {
+      btnCreateGuide.disabled = false;
+      btnCreateGuide.textContent = 'Create PDF Guide';
+    }
+  });
+}
 
 function buildGuideDocument(diagnosis, language) {
   const list = (items) => (items || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
