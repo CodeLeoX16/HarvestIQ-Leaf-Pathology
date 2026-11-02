@@ -1,5 +1,10 @@
 let currentFile = null;
 let cameraStream = null;
+const API_BASE_URL = (window.HARVESTIQ_CONFIG?.API_BASE_URL || '').replace(/\/+$/, '');
+
+function apiUrl(path) {
+  return `${API_BASE_URL}${path}`;
+}
 
 // UI DOM Handles
 const dropzone = document.getElementById('dropzone');
@@ -169,7 +174,7 @@ btnDiagnose.addEventListener('click', async () => {
   fd.append('leafImage', currentFile);
 
   try {
-    const res = await fetch('/api/diagnose', { method: 'POST', body: fd });
+    const res = await fetch(apiUrl('/api/diagnose'), { method: 'POST', body: fd });
     if (!res.ok) throw new Error("Diagnosis server response failed.");
 
     const data = await res.json();
@@ -243,7 +248,7 @@ btnCreateGuide.addEventListener('click', async () => {
   btnCreateGuide.disabled = true;
   btnCreateGuide.textContent = 'Preparing guide...';
   try {
-    const response = await fetch('/api/treatment-guide', {
+    const response = await fetch(apiUrl('/api/treatment-guide'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ diagnosis: latestDiagnosis, language: guideLanguage.value })

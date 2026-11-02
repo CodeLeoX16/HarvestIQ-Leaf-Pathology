@@ -18,10 +18,19 @@ load_dotenv()
 
 app = FastAPI(title="HarvestIQ Leaf Disease Engine")
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:8000,http://127.0.0.1:8000"
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -54,7 +63,7 @@ except Exception as e:
 raw_keys = os.getenv("GEMINI_API_KEY", "")
 api_keys = [k.strip() for k in raw_keys.split(",") if k.strip()]
 current_key_idx = 0
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 def get_gemini_client():
     global current_key_idx
@@ -344,8 +353,17 @@ async def diagnose_leaf(leafImage: UploadFile = File(...)):
         "preventions": ["Test with identical leaves to leverage zero-quota local caching."]
     })
 
-# Serve static frontend files
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "ok",
+        "model_loaded": model is not None and processor is not None,
+        "gemini_configured": bool(api_keys)
+    }
+
+
+if os.getenv("SERVE_FRONTEND", "true").lower() == "true":
+    app.mount("/", StaticFiles(directory="public", html=True), name="public")
 
 # ---------------------------------------------------------
 # 8. Server Execution (Isolated from venv file-watcher reloads)
